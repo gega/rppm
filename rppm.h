@@ -13,14 +13,6 @@
 #define RPPM_PACKRGB(r,g,b) (uint32_t)(((uint8_t)r)<<24|((uint8_t)g)<<16|((uint8_t)b)<<8)
 #define RPPM_GET_PIXEL(rppm,x,y) (uint32_t)((rppm)->pixels[(x)*(rppm)->width+(y)])
 
-#ifndef RPPM_MALLOC
-#define RPPM_MALLOC(m) malloc(m)
-#endif
-
-#ifndef RPPM_FREE
-#define RPPM_FREE(m) free(m)
-#endif
-
 struct rppm
 {
   int width,height;
@@ -30,6 +22,14 @@ struct rppm
 #endif
 
 #ifdef RPPM_IMPLEMENTATION
+
+#ifndef RPPM_MALLOC
+#define RPPM_MALLOC(m) malloc(m)
+#endif
+
+#ifndef RPPM_FREE
+#define RPPM_FREE(m) free(m)
+#endif
 
 int rppm_load(struct rppm *rppm, const char *filename)
 {
