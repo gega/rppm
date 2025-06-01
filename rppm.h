@@ -10,7 +10,7 @@
 #define RPPM_GREEN(p32) (uint8_t)((((uint32_t)p32)>>16)&0xff)
 #define RPPM_BLUE(p32)  (uint8_t)((((uint32_t)p32)>>8)&0xff)
 
-#define RPPM_PACKRGB(r,g,b) (uint32_t)(((uint8_t)r)<<24|((uint8_t)g)<<16|((uint8_t)b)<<8)
+#define RPPM_PACKRGB(r,g,b) (uint32_t)(((uint32_t)r)<<24|((uint32_t)g)<<16|((uint32_t)b)<<8)
 #define RPPM_GET_PIXEL(rppm,x,y) (uint32_t)((rppm)->pixels[(x)*(rppm)->width+(y)])
 
 struct rppm
