@@ -42,7 +42,7 @@ int rppm_load(struct rppm *rppm, const char *filename)
   if(!(f=fopen(filename,"rb"))) goto error;
   if(0==fread(&magic,2,1,f)) goto error;
   if(magic[0]!='P'||magic[1]!='6') goto error;
-  if(EOF==(fscanf(f,"%d %d\n%d\n", &rppm->width, &rppm->height, &maxcol))) goto error;
+  if(EOF==(fscanf(f,"%*[^0-9]%d %d\n%d\n", &rppm->width, &rppm->height, &maxcol))) goto error;
   if(maxcol<=0||maxcol>65536||rppm->width<=0||rppm->height<=0) goto error;
   if(NULL==(rppm->pixels=RPPM_MALLOC(rppm->width*rppm->height*sizeof(uint32_t)))) goto error;
   for(i=0;fread(&pixel,sizeof(pixel),1,f)==1;i++) rppm->pixels[i]=RPPM_PACKRGB(pixel[0],pixel[1],pixel[2]);
