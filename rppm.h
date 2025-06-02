@@ -33,16 +33,23 @@ struct rppm
 
 int rppm_load(struct rppm *rppm, const char *filename)
 {
-  char magic[2]={0};
+  static char *pattern[2]=
+  {
+    " %d %d\n%d\n",
+    "%*[^\n] %d %d\n%d\n"
+  };
+  char magic[3]={0};
   uint8_t pixel[3];
   FILE *f=NULL;
-  int maxcol,i;
+  int maxcol,i,pat=0,c;
 
   if(!rppm) goto error;
   if(!(f=fopen(filename,"rb"))) goto error;
-  if(0==fread(&magic,2,1,f)) goto error;
-  if(magic[0]!='P'||magic[1]!='6') goto error;
-  if(EOF==(fscanf(f,"%*[^0-9]%d %d\n%d\n", &rppm->width, &rppm->height, &maxcol))) goto error;
+  if(0==fread(&magic,3,1,f)) goto error;
+  if(magic[0]!='P'||magic[1]!='6'||magic[2]!='\n') goto error;
+  if((c=fgetc(f))=='#') pat=1;
+  else ungetc(c,f);
+  if(EOF==(fscanf(f,pattern[pat], &rppm->width, &rppm->height, &maxcol))) goto error;
   if(maxcol<=0||maxcol>65536||rppm->width<=0||rppm->height<=0) goto error;
   if(NULL==(rppm->pixels=RPPM_MALLOC(rppm->width*rppm->height*sizeof(uint32_t)))) goto error;
   for(i=0;fread(&pixel,sizeof(pixel),1,f)==1;i++) rppm->pixels[i]=RPPM_PACKRGB(pixel[0],pixel[1],pixel[2]);
