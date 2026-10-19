@@ -78,11 +78,12 @@ int rppm_load(struct rppm *rppm, const char *filename)
   int maxcol,i,pat=0,c;
 
   if(!rppm) goto error;
+  rppm->pixels=NULL;
   if(!(f=fopen(filename,"rb"))) goto error;
   if(0==fread(&magic,3,1,f)) goto error;
   if(magic[0]!='P'||magic[1]!='6'||magic[2]!='\n') goto error;
-  if((c=fgetc(f))=='#') pat=1;
-  else ungetc(c,f);
+  while((c=fgetc(f))=='#') while((c=fgetc(f))!='\n');
+  ungetc(c,f);
   if(EOF==(fscanf(f,pattern[pat], &rppm->width, &rppm->height, &maxcol))) goto error;
   if(maxcol<=0||maxcol>65536||rppm->width<=0||rppm->height<=0) goto error;
   if(NULL==(rppm->pixels=RPPM_MALLOC(rppm->width*rppm->height*sizeof(uint32_t)))) goto error;
@@ -93,13 +94,14 @@ int rppm_load(struct rppm *rppm, const char *filename)
   return(0);
 
 error:
+  if(rppm&&rppm->pixels) RPPM_FREE(rppm->pixels);
   if(f) fclose(f);
   return(-1);
 }
 
 void rppm_free(struct rppm *rppm)
 {
-  if(NULL!=rppm&&NULL!=rppm->pixels) RPPM_FREE(rppm->pixels);
+  if(rppm&&rppm->pixels) RPPM_FREE(rppm->pixels);
 }
 
 #endif
